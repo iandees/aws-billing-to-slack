@@ -26,3 +26,15 @@ Sends daily breakdowns of AWS costs to a Slack channel.
     ```
     serverless invoke --function report_cost --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz"
     ```
+
+## Support for AWS Credits
+
+If you have AWS credits on your account and want to see them taken into account on this report, head to [your billing dashboard](https://console.aws.amazon.com/billing/home?#/credits) and note down the "Expiration Date", "Amount Remaining", and the "as of" date towards the bottom of the page. Add all three of these items to the command line when executing the `deploy` or `invoke`:
+
+    ```
+    serverless deploy \
+        --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz" \
+        --credits_expire_date="mm/dd/yyyy" \
+        --credits_remaining_date="mm/dd/yyyy" \
+        --credits_remaining="xxx.xx"
+    ```
