@@ -1,0 +1,25 @@
+service: aws-billing-to-slack
+
+plugins:
+  - serverless-python-requirements
+
+provider:
+  name: aws
+  runtime: python3.7
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ce:GetCostAndUsage"
+      Resource: "*"
+
+functions:
+  report_cost:
+    handler: handler.report_cost
+
+    events:
+      # Every day at 15:00 UTC / 10am CDT
+      - schedule: cron(0 15 * * ? *)
+
+    environment:
+      SLACK_WEBHOOK_URL: ${opt:slack_url}
