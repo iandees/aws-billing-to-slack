@@ -19,7 +19,7 @@ def sparkline(datapoints):
 
     line = ""
     for dp in datapoints:
-        scaled = (dp - lower) / width
+        scaled = 1 if width == 0 else (dp - lower) / width
         which_spark = int(scaled * n_sparks)
         line += (sparks[which_spark])
 
