@@ -5,6 +5,9 @@ plugins:
 
 provider:
   name: aws
+  # Sane defaults, easy for multi-account/multi-region organizations
+  profile: ${opt:aws_profile, 'default'}
+  region: ${opt:aws_region, 'us-east-1'}
   runtime: python3.7
 
   iamRoleStatements:
@@ -12,10 +15,21 @@ provider:
       Action:
         - "ce:GetCostAndUsage"
       Resource: "*"
+    # Needed to get account alias
+    - Effect: "Allow"
+      Action:
+        - "iam:ListAccountAliases"
+      Resource: "*"
 
 functions:
   report_cost:
     handler: handler.report_cost
+
+    description: Send account daily billing data to Slack channel
+
+    # Keep costs minimal
+    memorySize: 128
+    timeout: 10
 
     events:
       # Every day at 15:00 UTC / 10am CDT
