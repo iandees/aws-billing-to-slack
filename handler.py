@@ -33,8 +33,9 @@ def report_cost(event, context):
     # Get account alias
     iam = boto3.client('iam')
     paginator = iam.get_paginator('list_account_aliases')
+    account_name = '[NOT FOUND]'
     for aliases in paginator.paginate(PaginationConfig={'MaxItems': 1}):
-        account_name = " for account " + aliases['AccountAliases'][0]
+        account_name = aliases['AccountAliases'][0]
 
     client = boto3.client('ce')
 
@@ -124,14 +125,14 @@ def report_cost(event, context):
         else:
             emoji = ":warning:"
 
-        summary = "%s Yesterday's cost" + account_name + " of $%5.2f is %.0f%% of credit budget $%5.2f for the day." % (
+        summary = "%s Yesterday's cost for account " + account_name + " of $%5.2f is %.0f%% of credit budget $%5.2f for the day." % (
             emoji,
             total_costs[-1],
             relative_to_budget,
             allowed_credits_per_day,
         )
     else:
-        summary = "Yesterday's cost" + account_name + " was $%5.2f" % (total_costs[-1])
+        summary = "Yesterday's cost for account " + account_name + " was $%5.2f" % (total_costs[-1])
 
     hook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if hook_url:
