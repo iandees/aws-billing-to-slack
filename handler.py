@@ -9,7 +9,9 @@ n_days = 7
 today = datetime.datetime.today()
 week_ago = today - datetime.timedelta(days=n_days)
 
-sparks = ['▁', '▂', '▃', '▄', '▅', '▆', '▇'] # Leaving out the full block because Slack doesn't like it: '█'
+# It seems that the sparkline symbols don't line up (probalby based on font?) so put them last
+# Also, leaving out the full block because Slack doesn't like it: '█'
+sparks = ['▁', '▂', '▃', '▄', '▅', '▆', '▇']
 
 def sparkline(datapoints):
     lower = min(datapoints)
@@ -26,7 +28,12 @@ def sparkline(datapoints):
     return line
 
 def delta(costs):
-    return ' (%+6.2f' % (((costs[-1] - costs[-2])/costs[-2]) * 100.0 ) + '%)'
+    if (costs[-1] >= 1 and costs[-2] >= 1):
+        # This only handles positive numbers
+        result = ((costs[-1]/costs[-2])-1)*100.0
+    else:
+        result = 0
+    return result
 
 def report_cost(event, context):
 
@@ -35,7 +42,8 @@ def report_cost(event, context):
     paginator = iam.get_paginator('list_account_aliases')
     account_name = '[NOT FOUND]'
     for aliases in paginator.paginate(PaginationConfig={'MaxItems': 1}):
-        account_name = aliases['AccountAliases'][0]
+        if 'AccountAliases' in aliases and len(aliases['AccountAliases']) > 0:
+            account_name = aliases['AccountAliases'][0]
 
     client = boto3.client('ce')
 
@@ -69,8 +77,6 @@ def report_cost(event, context):
 
     result = client.get_cost_and_usage(**query)
 
-    buffer = "%-40s %-7s  %7s     ∆%%\n" % ("Service", "Last 7d", "$ Yday")
-
     cost_per_day_by_service = defaultdict(list)
 
     # Build a map of service -> array of daily costs for the time frame
@@ -83,15 +89,20 @@ def report_cost(event, context):
     # Sort the map by yesterday's cost
     most_expensive_yesterday = sorted(cost_per_day_by_service.items(), key=lambda i: i[1][-1], reverse=True)
 
+    service_names = [k for k,_ in most_expensive_yesterday[:5]]
+    longest_name_len = len(max(service_names, key = len))
+
+    buffer = f"{'Service':{longest_name_len}} ${'Yday':8} {'∆%':>5} {'Last 7d':7}\n"
+
     for service_name, costs in most_expensive_yesterday[:5]:
-        buffer += "%-40s %s $%7.2f" % (service_name, sparkline(costs), costs[-1]) + delta(costs) + "\n"
+        buffer += f"{service_name:{longest_name_len}} ${costs[-1]:8,.2f} {delta(costs):4.0f}% {sparkline(costs):7}\n"
 
     other_costs = [0.0] * n_days
     for service_name, costs in most_expensive_yesterday[5:]:
         for i, cost in enumerate(costs):
             other_costs[i] += cost
 
-    buffer += "%-40s %s $%7.2f" % ("Other", sparkline(other_costs), other_costs[-1]) + delta(other_costs) + "\n" 
+    buffer += f"{'Other':{longest_name_len}} ${other_costs[-1]:8,.2f} {delta(other_costs):4.0f}% {sparkline(other_costs):7}\n"
 
     total_costs = [0.0] * n_days
     for day_number in range(n_days):
@@ -101,8 +112,7 @@ def report_cost(event, context):
             except IndexError:
                 total_costs[day_number] += 0.0
 
-
-    buffer += "%-40s %s $%7.2f" % ("Total", sparkline(total_costs), total_costs[-1]) + delta(total_costs) + "\n" 
+    buffer += f"{'Total':{longest_name_len}} ${total_costs[-1]:8,.2f} {delta(total_costs):4.0f}% {sparkline(total_costs):7}\n"
 
     credits_expire_date = os.environ.get('CREDITS_EXPIRE_DATE')
     if credits_expire_date:
@@ -125,14 +135,12 @@ def report_cost(event, context):
         else:
             emoji = ":warning:"
 
-        summary = "%s Yesterday's cost for account " + account_name + " of $%5.2f is %.0f%% of credit budget $%5.2f for the day." % (
-            emoji,
-            total_costs[-1],
-            relative_to_budget,
-            allowed_credits_per_day,
-        )
+        summary = (f"{emoji} Yesterday's cost for {account_name} ${total_costs[-1]:,.2f} "
+                   f"is {relative_to_budget:.2f}% of credit budget "
+                   f"${allowed_credits_per_day:,.2f} for the day."
+                  )
     else:
-        summary = "Yesterday's cost for account " + account_name + " was $%5.2f" % (total_costs[-1])
+        summary = f"Yesterday's cost for account {account_name} was ${total_costs[-1]:,.2f}"
 
     hook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if hook_url:
