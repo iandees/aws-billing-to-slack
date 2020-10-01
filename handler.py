@@ -138,7 +138,7 @@ def report_cost(event, context):
         else:
             emoji = ":warning:"
 
-        summary = (f"{emoji} Yesterday's cost of for {account_name} ${total_costs[-1]:,.2f} "
+        summary = (f"{emoji} Yesterday's cost for {account_name} ${total_costs[-1]:,.2f} "
                    f"is {relative_to_budget:.2f}% of credit budget "
                    f"${allowed_credits_per_day:,.2f} for the day."
                   )
