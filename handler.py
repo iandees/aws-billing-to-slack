@@ -42,11 +42,8 @@ def report_cost(event, context):
     paginator = iam.get_paginator('list_account_aliases')
     account_name = '[NOT FOUND]'
     for aliases in paginator.paginate(PaginationConfig={'MaxItems': 1}):
-        if ('AccountAliases' in aliases):
-            try:
-                account_name = aliases['AccountAliases'][0]
-            except IndexError:
-                pass
+        if 'AccountAliases' in aliases and len(aliases['AccountAliases']) > 0:
+            account_name = aliases['AccountAliases'][0]
 
     client = boto3.client('ce')
 
