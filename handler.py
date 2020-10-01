@@ -95,7 +95,7 @@ def report_cost(event, context):
     service_names = [k for k,_ in most_expensive_yesterday[:5]]
     longest_name_len = len(max(service_names, key = len))
 
-    buffer = f"{'service':{longest_name_len}} ${'Yday':8} {'∆%':>5} {'Last 7d':7}\n"
+    buffer = f"{'Service':{longest_name_len}} ${'Yday':8} {'∆%':>5} {'Last 7d':7}\n"
 
     for service_name, costs in most_expensive_yesterday[:5]:
         buffer += f"{service_name:{longest_name_len}} ${costs[-1]:8,.2f} {delta(costs):4.0f}% {sparkline(costs):7}\n"
