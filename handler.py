@@ -25,7 +25,18 @@ def sparkline(datapoints):
 
     return line
 
+def delta(costs):
+    return ' (%+6.2f' % (((costs[-1] - costs[-2])/costs[-2]) * 100.0 ) + '%)'
+
 def report_cost(event, context):
+
+    # Get account alias
+    iam = boto3.client('iam')
+    paginator = iam.get_paginator('list_account_aliases')
+    account_name = '[NOT FOUND]'
+    for aliases in paginator.paginate(PaginationConfig={'MaxItems': 1}):
+        account_name = aliases['AccountAliases'][0]
+
     client = boto3.client('ce')
 
     query = {
@@ -58,7 +69,7 @@ def report_cost(event, context):
 
     result = client.get_cost_and_usage(**query)
 
-    buffer = "%-40s %-7s $%5s\n" % ("Service", "Last 7d", "Yday")
+    buffer = "%-40s %-7s  %7s     ∆%%\n" % ("Service", "Last 7d", "$ Yday")
 
     cost_per_day_by_service = defaultdict(list)
 
@@ -67,21 +78,20 @@ def report_cost(event, context):
         for group in day['Groups']:
             key = group['Keys'][0]
             cost = float(group['Metrics']['UnblendedCost']['Amount'])
-
             cost_per_day_by_service[key].append(cost)
 
     # Sort the map by yesterday's cost
     most_expensive_yesterday = sorted(cost_per_day_by_service.items(), key=lambda i: i[1][-1], reverse=True)
 
     for service_name, costs in most_expensive_yesterday[:5]:
-        buffer += "%-40s %s $%5.2f\n" % (service_name, sparkline(costs), costs[-1])
+        buffer += "%-40s %s $%7.2f" % (service_name, sparkline(costs), costs[-1]) + delta(costs) + "\n"
 
     other_costs = [0.0] * n_days
     for service_name, costs in most_expensive_yesterday[5:]:
         for i, cost in enumerate(costs):
             other_costs[i] += cost
 
-    buffer += "%-40s %s $%5.2f\n" % ("Other", sparkline(other_costs), other_costs[-1])
+    buffer += "%-40s %s $%7.2f" % ("Other", sparkline(other_costs), other_costs[-1]) + delta(other_costs) + "\n" 
 
     total_costs = [0.0] * n_days
     for day_number in range(n_days):
@@ -91,7 +101,8 @@ def report_cost(event, context):
             except IndexError:
                 total_costs[day_number] += 0.0
 
-    buffer += "%-40s %s $%5.2f\n" % ("Total", sparkline(total_costs), total_costs[-1])
+
+    buffer += "%-40s %s $%7.2f" % ("Total", sparkline(total_costs), total_costs[-1]) + delta(total_costs) + "\n" 
 
     credits_expire_date = os.environ.get('CREDITS_EXPIRE_DATE')
     if credits_expire_date:
@@ -114,14 +125,14 @@ def report_cost(event, context):
         else:
             emoji = ":warning:"
 
-        summary = "%s Yesterday's cost of $%5.2f is %.0f%% of credit budget $%5.2f for the day." % (
+        summary = "%s Yesterday's cost for account " + account_name + " of $%5.2f is %.0f%% of credit budget $%5.2f for the day." % (
             emoji,
             total_costs[-1],
             relative_to_budget,
             allowed_credits_per_day,
         )
     else:
-        summary = "Yesterday's cost was $%5.2f." % (total_costs[-1])
+        summary = "Yesterday's cost for account " + account_name + " was $%5.2f" % (total_costs[-1])
 
     hook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if hook_url:
