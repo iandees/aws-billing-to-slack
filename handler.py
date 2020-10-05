@@ -28,7 +28,7 @@ def sparkline(datapoints):
     return line
 
 def delta(costs):
-    if (costs[-1] >= 1 and costs[-2] >= 1):
+    if (len(costs) > 1 and costs[-1] >= 1 and costs[-2] >= 1):
         # This only handles positive numbers
         result = ((costs[-1]/costs[-2])-1)*100.0
     else:
