@@ -15,10 +15,24 @@ Sends daily breakdowns of AWS costs to a Slack channel.
 
 1. Create an [incoming webhook](https://www.slack.com/apps/new/A0F7XDUAZ) that will post to the channel of your choice on your Slack workspace. Grab the URL for use in the next step.
 
+1. Create the service on your local machine. cd to your directory and run this command. Replace path with the path name for the service and app name for the service.
+
+   `serverless create --template-url="https://github.com/iandees/aws-billing-to-slack.git" 
+   --path="app-aws-cost" 
+   --name="app-aws-cost" `
+
+1. Install pipenv
+   
+   `pip install pipenv`
+
+1. Install serverless python requirements
+
+   `sls plugin install -n serverless-python-requirements`
+
 1. Deploy the system into your AWS account, replacing the webhook URL below with the one you generated above.
 
     ```
-    serverless deploy --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz"
+    serverless deploy --stage="prod" --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz"
     ```
 
     You can also run it once to verify that it works:
