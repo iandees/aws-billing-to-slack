@@ -2,7 +2,6 @@ service: aws-billing-to-slack
 
 plugins:
   - serverless-python-requirements
-
 provider:
   name: aws
   # Sane defaults, easy for multi-account/multi-region organizations
