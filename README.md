@@ -17,17 +17,24 @@ Sends daily breakdowns of AWS costs to a Slack channel.
 
 1. Create the service on your local machine. cd to your directory and run this command. Replace path with the path name for the service and app name for the service.
 
-   `serverless create --template-url="https://github.com/iandees/aws-billing-to-slack.git" 
-   --path="app-aws-cost" 
-   --name="app-aws-cost" `
+    ```
+    serverless create \
+      --template-url="https://github.com/iandees/aws-billing-to-slack.git" \
+      --path="app-aws-cost" \
+      --name="app-aws-cost"
+    ```
 
 1. Install pipenv
    
-   `pip install pipenv`
+    ```
+    pip install pipenv
+    ```
 
 1. Install serverless python requirements
 
-   `sls plugin install -n serverless-python-requirements`
+    ```
+    serverless plugin install -n serverless-python-requirements
+    ```
 
 1. Deploy the system into your AWS account, replacing the webhook URL below with the one you generated above.
 
