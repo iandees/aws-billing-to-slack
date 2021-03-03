@@ -6,7 +6,7 @@ import requests
 import sys
 
 n_days = 7
-today = datetime.datetime.today()
+today = datetime.datetime.today() - datetime.timedelta(days=1)
 week_ago = today - datetime.timedelta(days=n_days)
 
 # It seems that the sparkline symbols don't line up (probalby based on font?) so put them last
