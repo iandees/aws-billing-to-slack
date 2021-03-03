@@ -6,8 +6,8 @@ import requests
 import sys
 
 n_days = 7
-today = datetime.datetime.today()
-week_ago = today - datetime.timedelta(days=n_days)
+yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+week_ago = yesterday - datetime.timedelta(days=n_days)
 
 # It seems that the sparkline symbols don't line up (probalby based on font?) so put them last
 # Also, leaving out the full block because Slack doesn't like it: '█'
@@ -50,7 +50,7 @@ def report_cost(event, context):
     query = {
         "TimePeriod": {
             "Start": week_ago.strftime('%Y-%m-%d'),
-            "End": today.strftime('%Y-%m-%d'),
+            "End": yesterday.strftime('%Y-%m-%d'),
         },
         "Granularity": "DAILY",
         "Filter": {
