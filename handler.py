@@ -163,3 +163,7 @@ def report_cost(event, context):
     else:
         print(summary)
         print(buffer)
+
+if __name__ == "__main__":
+    # for running locally to test
+    report_cost(None, None)
