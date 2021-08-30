@@ -58,3 +58,12 @@ If you have AWS credits on your account and want to see them taken into account 
         --credits_remaining_date="mm/dd/yyyy" \
         --credits_remaining="xxx.xx"
     ```
+
+## Authors
+
+- [Alex Ley](https://github.com/Alex-ley)
+- [Enrico Stahn](https://github.com/estahn)
+- [Ian Dees](https://github.com/iandees)
+- [Regis Wilson](https://github.com/rwilson-release)
+- [Rui Pinho](https://github.com/ruiseek)
+- [Tamas Flamich](https://github.com/tamasflamich)
