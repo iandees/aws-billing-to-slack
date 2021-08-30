@@ -37,13 +37,20 @@ def delta(costs):
 
 def report_cost(event, context):
 
-    # Get account alias
-    iam = boto3.client('iam')
-    paginator = iam.get_paginator('list_account_aliases')
-    account_name = '[NOT FOUND]'
-    for aliases in paginator.paginate(PaginationConfig={'MaxItems': 1}):
-        if 'AccountAliases' in aliases and len(aliases['AccountAliases']) > 0:
-            account_name = aliases['AccountAliases'][0]
+    # Get account account name from env, or account id/account alias from boto3
+    account_name = os.environ.get("AWS_ACCOUNT_NAME", None)
+    if account_name is None:
+        iam = boto3.client("iam")
+        paginator = iam.get_paginator("list_account_aliases")
+        for aliases in paginator.paginate(PaginationConfig={"MaxItems": 1}):
+            if "AccountAliases" in aliases and len(aliases["AccountAliases"]) > 0:
+                account_name = aliases["AccountAliases"][0]
+
+    if account_name is None:
+        account_name = boto3.client("sts").get_caller_identity().get("Account")
+
+    if account_name is None:
+        account_name = "[NOT FOUND]"
 
     client = boto3.client('ce')
 
