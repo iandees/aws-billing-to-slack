@@ -47,7 +47,7 @@ def report_cost(event, context, result: dict = None, yesterday: str = None, new_
     # we have the correct length lists of costs (len is n_days)
     list_of_dates = [
         (week_ago + datetime.timedelta(days=x)).strftime('%Y-%m-%d')
-        for x in range(1, n_days + 1)
+        for x in range(n_days)
     ]
     print(list_of_dates)
 
