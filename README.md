@@ -59,6 +59,18 @@ If you have AWS credits on your account and want to see them taken into account 
         --credits_remaining="xxx.xx"
     ```
 
+## Other Useful CLI Arguments Related to your AWS account
+
+With none of the folling arguments passed (--aws_account, --aws_profile, --aws_region), sensible defaults are attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID. Additionally, for your AWS profile the environment variable AWS_PROFILE is read and used if present, otherwise fallback to 'default'. Finally, for your AWS region the environment variables AWS_REGION, then AWS_DEFAULT_REGION are read and used if present, otherwise fallback to 'us-east-1' (N. Virginia). However, if you supply one of these arguments when executing the `deploy` or `invoke` command, then these values are taken and no defaults are attempted to be retrieved:
+
+    ```
+    serverless deploy \
+        --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz" \
+        --aws_account="my custom account name" \
+        --aws_profile="default" \
+        --aws_region="eu-west-1"
+    ```
+
 ## Authors
 
 - [Alex Ley](https://github.com/Alex-ley)
