@@ -212,13 +212,13 @@ if __name__ == "__main__":
         example_result2 = json.load(f)
 
     # New Method with 2 example jsons
-    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-22", new_method=True)
+    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'    
-    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-28", new_method=True)
+    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
 
     # Old Method with same jsons (will fail)
-    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-22", new_method=False)
+    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37' 
-    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-28", new_method=False)
+    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
