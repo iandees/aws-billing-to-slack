@@ -35,7 +35,21 @@ def delta(costs):
         result = 0
     return result
 
-def report_cost(event, context):
+def report_cost(event, context, result: dict = None, yesterday: str = None, new_method=True):
+
+    if yesterday is None:
+        yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    else:
+        yesterday = datetime.datetime.strptime(yesterday, '%Y-%m-%d')
+
+    week_ago = yesterday - datetime.timedelta(days=n_days)
+    # Generate list of dates, so that even if our data is sparse,
+    # we have the correct length lists of costs (len is n_days)
+    list_of_dates = [
+        (week_ago + datetime.timedelta(days=x)).strftime('%Y-%m-%d')
+        for x in range(1, n_days + 1)
+    ]
+    print(list_of_dates)
 
     # Get account account name from env, or account id/account alias from boto3
     account_name = os.environ.get("AWS_ACCOUNT_NAME", None)
@@ -82,16 +96,36 @@ def report_cost(event, context):
         ],
     }
 
-    result = client.get_cost_and_usage(**query)
+    # Only run the query when on lambda, not when testing locally with example json
+    if result is None:
+        result = client.get_cost_and_usage(**query)
 
     cost_per_day_by_service = defaultdict(list)
 
-    # Build a map of service -> array of daily costs for the time frame
-    for day in result['ResultsByTime']:
-        for group in day['Groups']:
-            key = group['Keys'][0]
-            cost = float(group['Metrics']['UnblendedCost']['Amount'])
-            cost_per_day_by_service[key].append(cost)
+    if new_method == False:
+        # Build a map of service -> array of daily costs for the time frame
+        for day in result['ResultsByTime']:
+            for group in day['Groups']:
+                key = group['Keys'][0]
+                cost = float(group['Metrics']['UnblendedCost']['Amount'])
+                cost_per_day_by_service[key].append(cost)
+    else:
+        # New method, which first creates a dict of dicts
+        # then loop over the services and loop over the list_of_dates
+        # and this means even for sparse data we get a full list of costs
+        cost_per_day_dict = defaultdict(dict)
+
+        for day in result['ResultsByTime']:
+            start_date = day["TimePeriod"]["Start"]
+            for group in day['Groups']:
+                key = group['Keys'][0]
+                cost = float(group['Metrics']['UnblendedCost']['Amount'])
+                cost_per_day_dict[key][start_date] = cost
+
+        for key in cost_per_day_dict.keys():
+            for start_date in list_of_dates:
+                cost = cost_per_day_dict[key].get(start_date, 0.0) # fallback for sparse data
+                cost_per_day_by_service[key].append(cost)
 
     # Sort the map by yesterday's cost
     most_expensive_yesterday = sorted(cost_per_day_by_service.items(), key=lambda i: i[1][-1], reverse=True)
@@ -112,17 +146,16 @@ def report_cost(event, context):
     buffer += f"{'Other':{longest_name_len}} ${other_costs[-1]:8,.2f} {delta(other_costs):4.0f}% {sparkline(other_costs):7}\n"
 
     total_costs = [0.0] * n_days
-    reverse_stop = (-1 * n_days) - 1
-    for service_name, costs in most_expensive_yesterday:
-        # we must iterate from right to left,
-        # as a service could have just data for the last 3 days etc.
-        for day_number in range(-1, reverse_stop, -1):
+    for day_number in range(n_days):
+        for service_name, costs in most_expensive_yesterday:
             try:
                 total_costs[day_number] += costs[day_number]
             except IndexError:
                 total_costs[day_number] += 0.0
 
     buffer += f"{'Total':{longest_name_len}} ${total_costs[-1]:8,.2f} {delta(total_costs):4.0f}% {sparkline(total_costs):7}\n"
+
+    cost_per_day_by_service["total"] = total_costs[-1]
 
     credits_expire_date = os.environ.get('CREDITS_EXPIRE_DATE')
     if credits_expire_date:
@@ -167,6 +200,25 @@ def report_cost(event, context):
         print(summary)
         print(buffer)
 
+    # for running locally to test output
+    return cost_per_day_by_service
+
 if __name__ == "__main__":
     # for running locally to test
-    report_cost(None, None)
+    import json
+    with open("example_boto3_result.json", "r") as f:
+        example_result = json.load(f)
+    with open("example_boto3_result2.json", "r") as f:
+        example_result2 = json.load(f)
+
+    # New Method with 2 example jsons
+    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-22", new_method=True)
+    assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'    
+    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-28", new_method=True)
+    assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
+
+    # Old Method with same jsons (will fail)
+    cost_dict = report_cost(None, None, example_result, yesterday="2021-08-22", new_method=False)
+    assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37' 
+    cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-28", new_method=False)
+    assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
