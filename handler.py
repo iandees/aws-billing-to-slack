@@ -112,8 +112,11 @@ def report_cost(event, context):
     buffer += f"{'Other':{longest_name_len}} ${other_costs[-1]:8,.2f} {delta(other_costs):4.0f}% {sparkline(other_costs):7}\n"
 
     total_costs = [0.0] * n_days
-    for day_number in range(n_days):
-        for service_name, costs in most_expensive_yesterday:
+    reverse_stop = (-1 * n_days) - 1
+    for service_name, costs in most_expensive_yesterday:
+        # we must iterate from right to left,
+        # as a service could have just data for the last 3 days etc.
+        for day_number in range(-1, reverse_stop, -1):
             try:
                 total_costs[day_number] += costs[day_number]
             except IndexError:
