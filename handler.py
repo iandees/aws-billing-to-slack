@@ -5,9 +5,9 @@ import os
 import requests
 import sys
 
-n_days = 7
+n_days = 30
 yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-week_ago = yesterday - datetime.timedelta(days=n_days)
+month_ago = yesterday - datetime.timedelta(days=n_days)
 
 # It seems that the sparkline symbols don't line up (probalby based on font?) so put them last
 # Also, leaving out the full block because Slack doesn't like it: '█'
@@ -42,11 +42,11 @@ def report_cost(event, context, result: dict = None, yesterday: str = None, new_
     else:
         yesterday = datetime.datetime.strptime(yesterday, '%Y-%m-%d')
 
-    week_ago = yesterday - datetime.timedelta(days=n_days)
+    month_ago = yesterday - datetime.timedelta(days=n_days)
     # Generate list of dates, so that even if our data is sparse,
     # we have the correct length lists of costs (len is n_days)
     list_of_dates = [
-        (week_ago + datetime.timedelta(days=x)).strftime('%Y-%m-%d')
+        (month_ago + datetime.timedelta(days=x)).strftime('%Y-%m-%d')
         for x in range(n_days)
     ]
     print(list_of_dates)
@@ -70,10 +70,10 @@ def report_cost(event, context, result: dict = None, yesterday: str = None, new_
 
     query = {
         "TimePeriod": {
-            "Start": week_ago.strftime('%Y-%m-%d'),
+            "Start": month_ago.strftime('%Y-%m-%d'),
             "End": yesterday.strftime('%Y-%m-%d'),
         },
-        "Granularity": "DAILY",
+        "Granularity": "MONTHLY",
         "Filter": {
             "Not": {
                 "Dimensions": {
