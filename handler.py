@@ -92,6 +92,8 @@ def report_cost(event, context, result: dict = None, yesterday: str = None, new_
             {
                 "Type": "DIMENSION",
                 "Key": "SERVICE",
+                "Type": "TAG",
+                "Key": "system-code",
             },
         ],
     }
