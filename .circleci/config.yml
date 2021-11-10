@@ -16,6 +16,7 @@ jobs:
           command: |  # use pipenv to install dependencies
             python -m pip install --upgrade pip
             pipenv install --system --deploy
+            python ./handler.py
 
 workflows:
   main-workflow:
