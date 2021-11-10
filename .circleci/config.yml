@@ -11,11 +11,10 @@ jobs:
       - checkout
       - aws-cli/setup
       - run: python --version
-      - setup_remote_docker
       - run:
           name: Build Docker image
           command: |  # use pipenv to install dependencies
-            sudo pip3 install pipenv
+            sudo pip install pipenv
             pipenv install --system --deploy
 
 workflows:
