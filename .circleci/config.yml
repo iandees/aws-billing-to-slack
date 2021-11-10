@@ -4,7 +4,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.0
 
 jobs:
-  build:
+  build_and_run:
     docker:
       - image: cimg/python:3.10.0
     steps:
@@ -14,11 +14,13 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker image
-          command: docker build -t aws-billing-to-slack:latest .
+          command: |  # use pipenv to install dependencies
+            sudo pip3 install pipenv
+            pipenv install --system --deploy
 
 workflows:
   main-workflow:
     jobs:
-      - build:
+      - build_and_run:
           context:
             - aws
