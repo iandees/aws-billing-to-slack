@@ -16,6 +16,8 @@ jobs:
           command: |  # use pipenv to install dependencies
             python -m pip install --upgrade pip
             pipenv install --system --deploy
+            aws sts get-caller-identity
+            aws sts get-current-user
             python ./handler.py
 
 workflows:
