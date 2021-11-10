@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@2.0
+  aws-assume-role: airswap/assume-role@0.2.0
 
 jobs:
   build_and_run:
@@ -10,14 +11,13 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
+      - aws-assume-role/assume-role
       - run: python --version
       - run:
           name: Build Docker image
           command: |  # use pipenv to install dependencies
             python -m pip install --upgrade pip
             pipenv install --system --deploy
-            aws sts get-caller-identity
-            aws sts get-current-user
             python ./handler.py
 
 workflows:
