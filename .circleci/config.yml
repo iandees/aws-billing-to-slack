@@ -7,3 +7,7 @@ jobs:
     steps:
       - checkout
       - run: python --version
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: docker build -t aws-billing-to-slack:latest .
