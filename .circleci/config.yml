@@ -14,6 +14,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |  # use pipenv to install dependencies
+            python -m ensurepip --upgrade
             sudo pip install pipenv
             pipenv install --system --deploy
 
