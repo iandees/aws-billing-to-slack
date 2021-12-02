@@ -5,7 +5,7 @@ orbs:
   aws-assume-role: airswap/assume-role@0.2.0
 
 jobs:
-  build_and_run:
+  run_billing_tool:
     docker:
       - image: cimg/python:3.10.0
     steps:
@@ -14,8 +14,8 @@ jobs:
       - aws-assume-role/assume-role
       - run: python --version
       - run:
-          name: Build Docker image
-          command: |  # use pipenv to install dependencies
+          name: Run AWS Billing
+          command: |
             python -m pip install --upgrade pip
             pipenv install --system --deploy
             python ./handler.py
@@ -23,6 +23,18 @@ jobs:
 workflows:
   main-workflow:
     jobs:
-      - build_and_run:
+      - run_billing_tool:
+          context:
+            - aws
+  weekly:
+    triggers:
+      - schedule: # Triggered workflow runs once a week
+          cron: "0 10 * * 5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - run_billing_tool:
           context:
             - aws
