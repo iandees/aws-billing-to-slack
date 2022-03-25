@@ -38,13 +38,13 @@ Sends daily breakdowns of AWS costs to a Slack channel.
 1. Deploy the system into your AWS account, replacing the webhook URL below with the one you generated above.
 
     ```
-    serverless deploy --stage="prod" --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz"
+    serverless deploy --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
     ```
 
     You can also run it once to verify that it works:
 
     ```
-    serverless invoke --function report_cost --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz"
+    serverless invoke --function report_cost --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
     ```
 
 ## Support for AWS Credits
@@ -53,22 +53,21 @@ If you have AWS credits on your account and want to see them taken into account 
 
     ```
     serverless deploy \
-        --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz" \
-        --credits_expire_date="mm/dd/yyyy" \
-        --credits_remaining_date="mm/dd/yyyy" \
-        --credits_remaining="xxx.xx"
+        --param "slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz" \
+        --param "credits_expire_date=mm/dd/yyyy" \
+        --param "credits_remaining_date=mm/dd/yyyy" \
+        --param "credits_remaining=xxx.xx"
     ```
 
 ## Other Useful CLI Arguments Related to your AWS account
 
-With none of the folling arguments passed (--aws_account, --aws_profile, --aws_region), sensible defaults are attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID. Additionally, for your AWS profile the environment variable AWS_PROFILE is read and used if present, otherwise fallback to 'default'. Finally, for your AWS region the environment variables AWS_REGION, then AWS_DEFAULT_REGION are read and used if present, otherwise fallback to 'us-east-1' (N. Virginia). However, if you supply one of these arguments when executing the `deploy` or `invoke` command, then these values are taken and no defaults are attempted to be retrieved:
+By default, `AWS_PROFILE` and `AWS_REGION` are defaulting to `default` and `us-east-1`. These value can be changed by modifying the environment. For aws account, sensible default is attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID. 
+Additionally, for your AWS region the environment variables `AWS_REGION`, then `AWS_DEFAULT_REGION` are read and used if present, otherwise fallback to 'us-east-1' (N. Virginia).
 
     ```
-    serverless deploy \
-        --slack_url="https://hooks.slack.com/services/xxx/yyy/zzzz" \
-        --aws_account="my custom account name" \
-        --aws_profile="default" \
-        --aws_region="eu-west-1"
+    AWS_PROFILE="default" AWS_REGION="eu-west-1" serverless deploy \
+        --param "slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz" \
+        --param "aws_account=my custom account name"
     ```
 
 ## Authors

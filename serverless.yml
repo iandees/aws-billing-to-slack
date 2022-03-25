@@ -5,20 +5,22 @@ plugins:
 provider:
   name: aws
   # Sane defaults, easy for multi-account/multi-region organizations
-  profile: ${opt:aws_profile, env:AWS_PROFILE, 'default'}
-  region: ${opt:aws_region, env:AWS_REGION, env:AWS_DEFAULT_REGION, 'us-east-1'}
-  runtime: python3.7
+  profile: ${param:aws_profile, env:AWS_PROFILE, 'default'}
+  region: ${env:AWS_REGION, env:AWS_DEFAULT_REGION, 'us-east-1'}
+  runtime: python3.9
 
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "ce:GetCostAndUsage"
-      Resource: "*"
-    # Needed to get account alias
-    - Effect: "Allow"
-      Action:
-        - "iam:ListAccountAliases"
-      Resource: "*"
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "ce:GetCostAndUsage"
+          Resource: "*"
+          # Needed to get account alias
+        - Effect: "Allow"
+          Action:
+            - "iam:ListAccountAliases"
+          Resource: "*"
 
 functions:
   report_cost:
@@ -35,8 +37,8 @@ functions:
       - schedule: cron(0 15 * * ? *)
 
     environment:
-      SLACK_WEBHOOK_URL: ${opt:slack_url}
-      AWS_ACCOUNT_NAME: ${opt:aws_account}
-      CREDITS_EXPIRE_DATE: ${opt:credits_expire_date}
-      CREDITS_REMAINING_AS_OF: ${opt:credits_remaining_date}
-      CREDITS_REMAINING: ${opt:credits_remaining}
+      SLACK_WEBHOOK_URL: ${param:slack_url}
+      AWS_ACCOUNT_NAME: ${param:aws_account, ''}
+      CREDITS_EXPIRE_DATE: ${param:credits_expire_date, ''}
+      CREDITS_REMAINING_AS_OF: ${param:credits_remaining_date, ''}
+      CREDITS_REMAINING: ${param:credits_remaining, ''}
