@@ -61,7 +61,7 @@ If you have AWS credits on your account and want to see them taken into account 
 
 ## Support for other Dimensions
 
-If you have and AWS Organisation estaablished and would like to see a breakdown by account, you can override the default dimensions with parameters: 
+If you have and AWS Organisation established and would like to see a breakdown by account, you can override the default dimensions with parameters: 
 
     ```
     serverless deploy \
