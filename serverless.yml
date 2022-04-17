@@ -5,7 +5,7 @@ plugins:
 provider:
   name: aws
   # Sane defaults, easy for multi-account/multi-region organizations
-  profile: ${param:aws_profile, env:AWS_PROFILE, 'default'}
+#  profile: ${param:aws_profile, env:AWS_PROFILE, 'default'}
   region: ${env:AWS_REGION, env:AWS_DEFAULT_REGION, 'us-east-1'}
   runtime: python3.9
 
@@ -24,9 +24,9 @@ provider:
 
 functions:
   report_cost:
-    handler: handler.report_cost
+    handler: handler.lambda_handler
 
-    description: Send account daily billing data to Slack channel
+    description: Send account daily billing data to Slack/Teams
 
     # Keep costs minimal
     memorySize: 128
@@ -37,7 +37,10 @@ functions:
       - schedule: cron(0 15 * * ? *)
 
     environment:
-      SLACK_WEBHOOK_URL: ${param:slack_url}
+      GROUP_BY: ${param:group, 'SERVICE'}
+      LENGTH: ${param:group_length, 10}
+      SLACK_WEBHOOK_URL: ${param:slack_url, ''}
+      TEAMS_WEBHOOK_URL: ${param:teams_url, ''}
       AWS_ACCOUNT_NAME: ${param:aws_account, ''}
       CREDITS_EXPIRE_DATE: ${param:credits_expire_date, ''}
       CREDITS_REMAINING_AS_OF: ${param:credits_remaining_date, ''}
