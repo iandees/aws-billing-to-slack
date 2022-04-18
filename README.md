@@ -59,6 +59,42 @@ If you have AWS credits on your account and want to see them taken into account 
         --param "credits_remaining=xxx.xx"
     ```
 
+## Support for other Dimensions
+
+If you have and AWS Organisation established and would like to see a breakdown by account, you can override the default dimensions with parameters: 
+
+    ```
+    serverless deploy \
+        --param "slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz" \
+        --param "group=LINKED_ACCOUNT" \
+        --param "group_length=15"
+    ```
+
+Possible value for `group` are:
+
+* AZ
+* INSTANCE_TYPE 
+* LINKED_ACCOUNT 
+* OPERATION
+* PURCHASE_TYPE 
+* SERVICE
+* USAGE_TYPE 
+* PLATFORM 
+* TENANCY
+* RECORD_TYPE
+* LEGAL_ENTITY_NAME 
+* INVOICING_ENTITY 
+* DEPLOYMENT_OPTION 
+* DATABASE_ENGINE
+* CACHE_ENGINE
+* INSTANCE_TYPE_FAMILY
+* REGION, BILLING_ENTITY
+* RESERVATION_ID
+* SAVINGS_PLANS_TYPE
+* SAVINGS_PLAN_ARN
+* OPERATING_SYSTEM
+
+
 ## Other Useful CLI Arguments Related to your AWS account
 
 By default, `AWS_PROFILE` and `AWS_REGION` are defaulting to `default` and `us-east-1`. These value can be changed by modifying the environment. For aws account, sensible default is attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID. 
