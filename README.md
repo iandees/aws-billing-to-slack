@@ -24,7 +24,7 @@ Sends daily breakdowns of AWS costs to a Slack channel.
     ```
 
 1. Install pipenv
-   
+
     ```
     pip install pipenv
     ```
@@ -61,7 +61,7 @@ If you have AWS credits on your account and want to see them taken into account 
 
 ## Support for other Dimensions
 
-If you have and AWS Organisation established and would like to see a breakdown by account, you can override the default dimensions with parameters: 
+If you have and AWS Organisation established and would like to see a breakdown by account, you can override the default dimensions with parameters:
 
     ```
     serverless deploy \
@@ -73,18 +73,18 @@ If you have and AWS Organisation established and would like to see a breakdown b
 Possible value for `group` are:
 
 * AZ
-* INSTANCE_TYPE 
-* LINKED_ACCOUNT 
+* INSTANCE_TYPE
+* LINKED_ACCOUNT
 * OPERATION
-* PURCHASE_TYPE 
+* PURCHASE_TYPE
 * SERVICE
-* USAGE_TYPE 
-* PLATFORM 
+* USAGE_TYPE
+* PLATFORM
 * TENANCY
 * RECORD_TYPE
-* LEGAL_ENTITY_NAME 
-* INVOICING_ENTITY 
-* DEPLOYMENT_OPTION 
+* LEGAL_ENTITY_NAME
+* INVOICING_ENTITY
+* DEPLOYMENT_OPTION
 * DATABASE_ENGINE
 * CACHE_ENGINE
 * INSTANCE_TYPE_FAMILY
@@ -97,7 +97,7 @@ Possible value for `group` are:
 
 ## Other Useful CLI Arguments Related to your AWS account
 
-By default, `AWS_PROFILE` and `AWS_REGION` are defaulting to `default` and `us-east-1`. These value can be changed by modifying the environment. For aws account, sensible default is attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID. 
+By default, `AWS_PROFILE` and `AWS_REGION` are defaulting to `default` and `us-east-1`. These value can be changed by modifying the environment. For aws account, sensible default is attempted to be retrieved. For example, boto3 is used to try and determine your AWS account alias if it exists, and if not your AWS account ID.
 Additionally, for your AWS region the environment variables `AWS_REGION`, then `AWS_DEFAULT_REGION` are read and used if present, otherwise fallback to 'us-east-1' (N. Virginia).
 
     ```
@@ -105,19 +105,6 @@ Additionally, for your AWS region the environment variables `AWS_REGION`, then `
         --param "slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz" \
         --param "aws_account=my custom account name"
     ```
-
-## Troubleshooting:
-These are few possible error someone could encounter and the available fix:
-
-***Issue:*** Resource handler returned message: "Unzipped size must be smaller than 262144000 bytes"
-
-***Fix:*** Added the exclude directive on serverless.yml
-```
-package:
-  exclude:
-    - node_modules/**
-    - venv/**
-```
 
 ## Authors
 
