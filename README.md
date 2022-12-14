@@ -106,6 +106,19 @@ Additionally, for your AWS region the environment variables `AWS_REGION`, then `
         --param "aws_account=my custom account name"
     ```
 
+## Troubleshooting:
+These are few possible error someone could encounter and the available fix:
+
+***Issue:*** Resource handler returned message: "Unzipped size must be smaller than 262144000 bytes"
+
+***Fix:*** Added the exclude directive on serverless.yml
+```
+package:
+  exclude:
+    - node_modules/**
+    - venv/**
+```
+
 ## Authors
 
 - [Alex Ley](https://github.com/Alex-ley)
