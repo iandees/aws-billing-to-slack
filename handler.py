@@ -266,15 +266,21 @@ if __name__ == "__main__":
     # summary, buffer, data = report_cost(group_by="SERVICE", length=20)
     # print(summary)
     # print(buffer)
+    # summary, buffer, data = report_cost(group_by="SERVICE", length=5, cost_aggregation="UnblendedCost")
+    # print(summary)
+    # print(buffer)
+    # summary, buffer, data = report_cost(group_by="SERVICE", length=5, cost_aggregation="AmortizedCost")
+    # print(summary)
+    # print(buffer)
 
     # New Method with 2 example jsons
-    summary, buffer, cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=True)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result, yesterday="2021-08-23", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'
-    summary, buffer, cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=True)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result2, yesterday="2021-08-29", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
 
     # Old Method with same jsons (will fail)
-    summary, buffer, cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=False)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result, yesterday="2021-08-23", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'
-    summary, buffer, cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=False)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result2, yesterday="2021-08-29", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
