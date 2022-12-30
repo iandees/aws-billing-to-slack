@@ -106,6 +106,12 @@ Additionally, for your AWS region the environment variables `AWS_REGION`, then `
         --param "aws_account=my custom account name"
     ```
 
+## Support for different cost aggretations
+
+By default we show the unblended costs, but if you set the environment variable `COST_AGGREGATION` to something else, you can change the cost aggretation AWS uses.
+Possible values are: AmortizedCost, BlendedCost, NetAmortizedCost, NetUnblendedCost, NormalizedUsageAmount, UnblendedCost, and UsageQuantity.
+More information is available [at the Metrics request parameter here](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html)
+
 ## Authors
 
 - [Alex Ley](https://github.com/Alex-ley)
