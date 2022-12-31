@@ -47,8 +47,9 @@ def find_by_key(values: list, key: str, value: str):
 def lambda_handler(event, context):
     group_by = os.environ.get("GROUP_BY", "SERVICE")
     length = int(os.environ.get("LENGTH", "5"))
+    cost_aggregation = os.environ.get("COST_AGGREGATION", "UnblendedCost")
 
-    summary, buffer, data = report_cost(group_by=group_by, length=length)
+    summary, buffer, data = report_cost(group_by=group_by, length=length, cost_aggregation=cost_aggregation)
 
     slack_hook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if slack_hook_url:
@@ -59,7 +60,7 @@ def lambda_handler(event, context):
         publish_teams(teams_hook_url, summary, buffer)
 
 
-def report_cost(group_by: str = "SERVICE", length: int = 5, result: dict = None, yesterday: str = None, new_method=True):
+def report_cost(group_by: str = "SERVICE", length: int = 5, cost_aggregation: str = "UnblendedCost", result: dict = None, yesterday: str = None, new_method=True):
 
     if yesterday is None:
         yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
@@ -111,7 +112,7 @@ def report_cost(group_by: str = "SERVICE", length: int = 5, result: dict = None,
                 }
             }
         },
-        "Metrics": ["UnblendedCost"],
+        "Metrics": [cost_aggregation],
         "GroupBy": [
             {
                 "Type": "DIMENSION",
@@ -131,7 +132,7 @@ def report_cost(group_by: str = "SERVICE", length: int = 5, result: dict = None,
         for day in result['ResultsByTime']:
             for group in day['Groups']:
                 key = group['Keys'][0]
-                cost = float(group['Metrics']['UnblendedCost']['Amount'])
+                cost = float(group['Metrics'][cost_aggregation]['Amount'])
                 cost_per_day_by_service[key].append(cost)
     else:
         # New method, which first creates a dict of dicts
@@ -147,7 +148,7 @@ def report_cost(group_by: str = "SERVICE", length: int = 5, result: dict = None,
                     dimension = find_by_key(result["DimensionValueAttributes"], "Value", key)
                     if dimension:
                         key += " ("+dimension["Attributes"]["description"]+")"
-                cost = float(group['Metrics']['UnblendedCost']['Amount'])
+                cost = float(group['Metrics'][cost_aggregation]['Amount'])
                 cost_per_day_dict[key][start_date] = cost
 
         for key in cost_per_day_dict.keys():
@@ -265,15 +266,21 @@ if __name__ == "__main__":
     # summary, buffer, data = report_cost(group_by="SERVICE", length=20)
     # print(summary)
     # print(buffer)
+    # summary, buffer, data = report_cost(group_by="SERVICE", length=5, cost_aggregation="UnblendedCost")
+    # print(summary)
+    # print(buffer)
+    # summary, buffer, data = report_cost(group_by="SERVICE", length=5, cost_aggregation="AmortizedCost")
+    # print(summary)
+    # print(buffer)
 
     # New Method with 2 example jsons
-    summary, buffer, cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=True)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result, yesterday="2021-08-23", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'
-    summary, buffer, cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=True)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result2, yesterday="2021-08-29", new_method=True)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
 
     # Old Method with same jsons (will fail)
-    summary, buffer, cost_dict = report_cost(None, None, example_result, yesterday="2021-08-23", new_method=False)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result, yesterday="2021-08-23", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "286.37", f'{cost_dict.get("total"):,.2f} != 286.37'
-    summary, buffer, cost_dict = report_cost(None, None, example_result2, yesterday="2021-08-29", new_method=False)
+    summary, buffer, cost_dict = report_cost(None, None, "UnblendedCost", example_result2, yesterday="2021-08-29", new_method=False)
     assert "{0:.2f}".format(cost_dict.get("total", 0.0)) == "21.45", f'{cost_dict.get("total"):,.2f} != 21.45'
