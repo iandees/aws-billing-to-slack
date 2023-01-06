@@ -16,15 +16,12 @@ sparks = ['▁', '▂', '▃', '▄', '▅', '▆', '▇']
 def sparkline(datapoints):
     lower = min(datapoints)
     upper = max(datapoints)
-    width = upper - lower
     n_sparks = len(sparks) - 1
-
     line = ""
     for dp in datapoints:
-        scaled = 1 if width == 0 else (dp - lower) / width
-        which_spark = int(scaled * n_sparks)
+        scaled = 1 if upper == 0 else dp/upper
+        which_spark = round(scaled * n_sparks)
         line += (sparks[which_spark])
-
     return line
 
 
