@@ -17,8 +17,8 @@ def sparkline(datapoints):
     lower = min(datapoints)
     upper = max(datapoints)
     n_sparks = len(sparks) - 1
-    line = ""
 
+    line = ""
     for dp in datapoints:
         scaled = 1 if upper == 0 else dp/upper
         which_spark = round(scaled * n_sparks)
