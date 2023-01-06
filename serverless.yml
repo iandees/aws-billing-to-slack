@@ -9,7 +9,7 @@ package:
 provider:
   name: aws
   # Sane defaults, easy for multi-account/multi-region organizations
-  #profile: ${param:aws_profile, env:AWS_PROFILE, 'default'}
+  profile: ${param:aws_profile, env:AWS_PROFILE, 'default'}
   region: ${env:AWS_REGION, env:AWS_DEFAULT_REGION, 'us-east-1'}
   runtime: python3.9
 
