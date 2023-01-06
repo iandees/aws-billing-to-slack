@@ -18,10 +18,12 @@ def sparkline(datapoints):
     upper = max(datapoints)
     n_sparks = len(sparks) - 1
     line = ""
+
     for dp in datapoints:
         scaled = 1 if upper == 0 else dp/upper
         which_spark = round(scaled * n_sparks)
         line += (sparks[which_spark])
+
     return line
 
 
@@ -71,7 +73,6 @@ def report_cost(group_by: str = "SERVICE", length: int = 5, cost_aggregation: st
         (week_ago + datetime.timedelta(days=x)).strftime('%Y-%m-%d')
         for x in range(n_days)
     ]
-    print(list_of_dates)
 
     # Get account account name from env, or account id/account alias from boto3
     account_name = os.environ.get("AWS_ACCOUNT_NAME", None)
