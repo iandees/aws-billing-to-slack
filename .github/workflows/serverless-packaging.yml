@@ -39,4 +39,5 @@ jobs:
         npm -g install serverless
         serverless create --template-path . --path="/tmp/app-aws-cost" --name="app-aws-cost"
         cd /tmp/app-aws-cost
+        serverless plugin install -n serverless-python-requirements
         serverless package --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
