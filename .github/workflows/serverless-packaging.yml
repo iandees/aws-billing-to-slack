@@ -37,6 +37,6 @@ jobs:
     - name: Test Serverless packaging
       run: |
         npm -g install serverless
-        serverless create --template-path . --path="app-aws-cost" --name="app-aws-cost"
-        cd app-aws-cost
+        serverless create --template-path . --path="/tmp/app-aws-cost" --name="app-aws-cost"
+        cd /tmp/app-aws-cost
         serverless package --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
