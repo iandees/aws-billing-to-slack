@@ -6,8 +6,9 @@ import requests
 import sys
 
 n_days = 7
-yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-week_ago = yesterday - datetime.timedelta(days=n_days)
+today = datetime.datetime.today()
+yesterday = today - datetime.timedelta(days=1)
+week_ago = today - datetime.timedelta(days=n_days)
 
 # It seems that the sparkline symbols don't line up (probably based on font?) so put them last
 # Also, leaving out the full block because Slack doesn't like it: '█'
@@ -62,11 +63,11 @@ def lambda_handler(event, context):
 def report_cost(group_by: str = "SERVICE", length: int = 5, cost_aggregation: str = "UnblendedCost", result: dict = None, yesterday: str = None, new_method=True):
 
     if yesterday is None:
-        yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+        yesterday = today - datetime.timedelta(days=1)
     else:
         yesterday = datetime.datetime.strptime(yesterday, '%Y-%m-%d')
 
-    week_ago = yesterday - datetime.timedelta(days=n_days)
+    week_ago = today - datetime.timedelta(days=n_days)
     # Generate list of dates, so that even if our data is sparse,
     # we have the correct length lists of costs (len is n_days)
     list_of_dates = [
@@ -94,7 +95,7 @@ def report_cost(group_by: str = "SERVICE", length: int = 5, cost_aggregation: st
     query = {
         "TimePeriod": {
             "Start": week_ago.strftime('%Y-%m-%d'),
-            "End": yesterday.strftime('%Y-%m-%d'),
+            "End": today.strftime('%Y-%m-%d'),
         },
         "Granularity": "DAILY",
         "Filter": {
