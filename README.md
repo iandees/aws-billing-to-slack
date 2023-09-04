@@ -26,7 +26,7 @@ Sends daily breakdowns of AWS costs to a Slack channel.
 1. Install pipenv
 
     ```
-    pip install pipenv
+    pip install pipenv==2023.7.4
     ```
 
 1. Install serverless python requirements
