@@ -58,7 +58,10 @@ def lambda_handler(event, context):
     teams_hook_url = os.environ.get('TEAMS_WEBHOOK_URL')
     if teams_hook_url:
         publish_teams(teams_hook_url, summary, buffer)
-
+    
+    google_hook_url = os.environ.get('GOOGLE_WEBHOOK_URL')
+    if google_hook_url:
+        publish_google(google_hook_url, summary, buffer)
 
 def report_cost(group_by: str = "SERVICE", length: int = 5, cost_aggregation: str = "UnblendedCost", result: dict = None, yesterday: str = None, new_method=True):
 
@@ -241,6 +244,16 @@ def publish_teams(hook_url, summary, buffer):
     if resp.status_code != 200:
         print("HTTP %s: %s" % (resp.status_code, resp.text))
 
+def publish_google(hook_url, summary, buffer):
+
+    message = {
+        "text": summary + "\n\n```\n" + buffer + "\n```"
+    }
+    
+    resp = requests.post(hook_url, json=message)
+
+    if resp.status_code != 200:
+        print("HTTP %s: %s" % (resp.status_code, resp.text))
 
 if __name__ == "__main__":
     # for running locally to test
