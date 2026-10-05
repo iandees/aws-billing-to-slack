@@ -30,7 +30,7 @@ functions:
   report_cost:
     handler: handler.lambda_handler
 
-    description: Send account daily billing data to Slack/Teams
+    description: Send account daily billing data to Slack, Discord, Teams, or Google Chat
 
     # Keep costs minimal
     memorySize: 128
@@ -44,6 +44,7 @@ functions:
       GROUP_BY: ${param:group, 'SERVICE'}
       LENGTH: ${param:group_length, 10}
       SLACK_WEBHOOK_URL: ${param:slack_url, ''}
+      DISCORD_WEBHOOK_URL: ${param:discord_url, ''}
       TEAMS_WEBHOOK_URL: ${param:teams_url, ''}
       AWS_ACCOUNT_NAME: ${param:aws_account, ''}
       CREDITS_EXPIRE_DATE: ${param:credits_expire_date, ''}
