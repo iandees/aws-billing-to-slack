@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/261584/66362145-3903a200-e947-11e9-91bd-6e40e5919ac4.png)
 
-Sends daily breakdowns of AWS costs to a Slack channel.
+Sends daily breakdowns of AWS costs to Slack, Discord, Microsoft Teams, or Google Chat.
 
 # Install
 
@@ -13,6 +13,8 @@ Sends daily breakdowns of AWS costs to a Slack channel.
     ```
 
 1. Create an [incoming webhook](https://www.slack.com/apps/new/A0F7XDUAZ) that will post to the channel of your choice on your Slack workspace. Grab the URL for use in the next step.
+
+   To send reports to Discord, create a webhook in the channel's **Edit Channel → Integrations → Webhooks** settings and use its URL as `discord_url` below. Slack and Discord webhooks can both be configured to send the report to both services.
 
 1. Create the service on your local machine. cd to your directory and run this command. Replace path with the path name for the service and app name for the service.
 
@@ -41,10 +43,12 @@ Sends daily breakdowns of AWS costs to a Slack channel.
     serverless deploy --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
     ```
 
-    You can also run it once to verify that it works:
+    For Discord, pass `--param="discord_url=https://discord.com/api/webhooks/xxx/yyy"` instead, or add it alongside the Slack parameter to send to both.
+
+    You can also run it once to verify that it works. For Discord, use `--param="discord_url=https://discord.com/api/webhooks/xxx/yyy"` instead of the Slack parameter (or pass both parameters to send to both):
 
     ```
-    serverless invoke --function report_cost --stage="prod" --param="slack_url=https://hooks.slack.com/services/xxx/yyy/zzzz"
+    serverless invoke --function report_cost --stage="prod" --param="discord_url=https://discord.com/api/webhooks/xxx/yyy"
     ```
 
 ## Support for AWS Credits

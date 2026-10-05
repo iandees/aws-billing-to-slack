@@ -55,6 +55,10 @@ def lambda_handler(event, context):
     if slack_hook_url:
         publish_slack(slack_hook_url, summary, buffer)
 
+    discord_hook_url = os.environ.get('DISCORD_WEBHOOK_URL')
+    if discord_hook_url:
+        publish_discord(discord_hook_url, summary, buffer)
+
     teams_hook_url = os.environ.get('TEAMS_WEBHOOK_URL')
     if teams_hook_url:
         publish_teams(teams_hook_url, summary, buffer)
@@ -231,6 +235,16 @@ def publish_slack(hook_url, summary, buffer):
     )
 
     if resp.status_code != 200:
+        print("HTTP %s: %s" % (resp.status_code, resp.text))
+
+
+def publish_discord(hook_url, summary, buffer):
+    resp = requests.post(
+        hook_url,
+        json={"content": summary + "\n\n```\n" + buffer + "\n```"},
+    )
+
+    if resp.status_code not in (200, 204):
         print("HTTP %s: %s" % (resp.status_code, resp.text))
 
 
