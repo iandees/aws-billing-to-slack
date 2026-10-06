@@ -9,7 +9,7 @@ Sends daily breakdowns of AWS costs to a Slack channel.
 1. Install [`serverless`](https://serverless.com/), which I use to configure the AWS Lambda function that runs daily.
 
     ```
-    npm install -g serverless
+    npm install -g serverless@^3
     ```
 
 1. Create an [incoming webhook](https://www.slack.com/apps/new/A0F7XDUAZ) that will post to the channel of your choice on your Slack workspace. Grab the URL for use in the next step.
